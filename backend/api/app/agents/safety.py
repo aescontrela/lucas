@@ -9,9 +9,8 @@ class SafetyAgent(BaseAgent):
         )
         self.system = (
             "You are a safety and health research expert for travelers. "
-            "Research areas to avoid, common scams, tap water safety, recommended "
-            "vaccinations, emergency numbers, pharmacy availability, and general "
-            "safety tips."
+            "Research areas to avoid, common scams, tap water safety, vaccinations, "
+            "emergency numbers, pharmacy availability, and general safety tips."
         )
 
     def build_prompt(self, query):

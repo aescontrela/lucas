@@ -6,8 +6,7 @@ class FoodAgent(BaseAgent):
         super().__init__(name="food", description="Researches local food and dining")
         self.system = (
             "You are a food research expert for travelers. "
-            "Research local dishes, food neighborhoods, street food, "
-            "dietary info, and typical prices."
+            "Research local dishes, food neighborhoods, street food, dietary info, and typical prices."
         )
 
     def build_prompt(self, query):

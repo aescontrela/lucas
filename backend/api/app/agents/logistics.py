@@ -6,9 +6,8 @@ class LogisticsAgent(BaseAgent):
         super().__init__(name="logistics", description="Researches travel logistics")
         self.system = (
             "You are a logistics research expert for travelers. "
-            "Research airport transit options, public transportation, "
-            "useful local apps, SIM card and WiFi options, currency exchange, "
-            "tipping customs, and practical travel tips."
+            "Research airport transit, public transportation, useful local apps, "
+            "SIM and WiFi options, currency and tipping customs, and practical travel tips."
         )
 
     def build_prompt(self, query):

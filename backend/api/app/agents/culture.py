@@ -9,9 +9,8 @@ class CultureAgent(BaseAgent):
         )
         self.system = (
             "You are a culture and history research expert for travelers. "
-            "Research local customs, etiquette, historical context, language "
-            "basics and useful phrases, local events and festivals, and "
-            "cultural dos and don'ts."
+            "Research local customs, etiquette, historical context, language basics and useful phrases, "
+            "local events and festivals, and cultural dos and don'ts."
         )
 
     def build_prompt(self, query):

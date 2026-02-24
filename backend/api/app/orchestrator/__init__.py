@@ -8,25 +8,27 @@ from app.agents.safety import SafetyAgent
 from app.agents.planner import PlannerAgent
 
 
-async def run_research(query) -> dict[str, dict]:
-    """Run the planner and selected research agents; return a dict of agent name -> result."""
+async def stream_research(query):
+    """Stream the planner and selected agents, yielding planner and agent results as they complete."""
     planner = PlannerAgent()
-    agents = [
-        CultureAgent(),
-        FoodAgent(),
-        LogisticsAgent(),
-        MustDoAgent(),
-        SafetyAgent(),
-    ]
-    agent_list = [{"name": a.name, "description": a.description} for a in agents]
-
+    agents = [CultureAgent(), FoodAgent(), LogisticsAgent(), MustDoAgent(), SafetyAgent()]
+    agent_list = [{"name": a.name, "description": a.system} for a in agents]
     plan = await planner.run(query, agent_list)
 
     if not isinstance(plan, dict) or "query" not in plan or "agents" not in plan:
         raise ValueError("Planner did not return expected plan shape (query, agents)")
 
+    yield {"event": "plan", "data": plan}
+
     selected = [agent for agent in agents if agent.name in plan["agents"]]
 
-    results = await asyncio.gather(*[agent.run(plan["query"]) for agent in selected])
+    async def run_and_tag(agent):
+        try:
+            result = await agent.run(plan["query"])
+            return agent.name, result, None
+        except Exception as e:
+            return agent.name, None, str(e)
 
-    return {agent.name: result for agent, result in zip(selected, results)}
+    for coro in asyncio.as_completed([run_and_tag(agent) for agent in selected]):
+        agent_name, result, error = await coro
+        yield {"event": "agent", "agent": agent_name, "data": result, "error": error}

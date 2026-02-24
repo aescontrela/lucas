@@ -9,6 +9,7 @@ class PlannerAgent:
         self.client = client
         self.model = settings.claude_model
         self.max_tokens = settings.claude_max_tokens
+        self.name = "planner"
         self.system = (
             "You are a travel planning assistant. Analyze the user's query, "
             "extract key travel details, and select which research agents to activate. "

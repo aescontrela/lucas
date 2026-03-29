@@ -10,6 +10,11 @@ class BaseAgentOutput(BaseModel):
     sections: list[Section]
 
 
-class PlannerAgentOutput(BaseModel):
+class AgentTask(BaseModel):
+    name: str
+    task: str
+
+
+class RouterAgentOutput(BaseModel):
     query: str
-    agents: list[str]
+    agents: list[AgentTask]

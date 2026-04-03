@@ -9,13 +9,17 @@ dependencies = [
     "fastapi[standard]>=0.128.4",
     "pydantic-settings>=2.12.0",
 ]
-
+                                           
 [tool.pytest.ini_options]
 pythonpath = ["."]
 markers = [
     "unit: mark a test as a unit test (e.g. tests/unit/).",
     "integration: mark a test as a integration test (e.g. tests/integration/)."
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
 
 [dependency-groups]
 dev = [

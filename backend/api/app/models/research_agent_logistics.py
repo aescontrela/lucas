@@ -1,9 +1,9 @@
 from anthropic import AsyncAnthropic
 from app.config import Settings
-from app.models.base import BaseAgent
+from app.models.research_agent import ResearchAgent
 
 
-class LogisticsAgent(BaseAgent):
+class LogisticsAgent(ResearchAgent):
     def __init__(self, client: AsyncAnthropic, settings: Settings):
         super().__init__(
             name="logistics",
@@ -11,7 +11,7 @@ class LogisticsAgent(BaseAgent):
             client=client,
             settings=settings,
         )
-        self.system = (
+        self.system_prompt = (
             "You are a logistics research expert for travelers. "
             "You know transportation, local apps, SIM and WiFi options, currency, and practical travel tips intimately."
         )

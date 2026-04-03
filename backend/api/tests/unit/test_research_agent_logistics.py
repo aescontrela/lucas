@@ -1,9 +1,9 @@
 import pytest
-from app.models.logistics import LogisticsAgent
+from app.models.research_agent_logistics import LogisticsAgent
 
 
 @pytest.mark.asyncio
-async def test_logistics_agent_run(
+async def test_research_agent_logistics_run(
     mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
 ):
     agent = LogisticsAgent(client=mock_client, settings=mock_settings)

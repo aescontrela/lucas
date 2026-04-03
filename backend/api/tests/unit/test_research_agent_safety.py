@@ -1,9 +1,9 @@
 import pytest
-from app.models.safety import SafetyAgent
+from app.models.research_agent_safety import SafetyAgent
 
 
 @pytest.mark.asyncio
-async def test_safety_agent_run(
+async def test_research_agent_safety_run(
     mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
 ):
     agent = SafetyAgent(client=mock_client, settings=mock_settings)

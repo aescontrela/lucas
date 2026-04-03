@@ -1,9 +1,9 @@
 import pytest
-from app.models.food import FoodAgent
+from app.models.research_agent_food import FoodAgent
 
 
 @pytest.mark.asyncio
-async def test_food_agent_run(
+async def test_research_agent_food_run(
     mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
 ):
     agent = FoodAgent(client=mock_client, settings=mock_settings)

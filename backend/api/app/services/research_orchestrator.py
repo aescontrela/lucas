@@ -1,17 +1,19 @@
 import asyncio
 
 from app.models.router import RouterAgent
-from app.models.base import BaseAgent
+from app.models.research_agent import ResearchAgent
 
 
 class ResearchOrchestrator:
-    def __init__(self, router: RouterAgent, agents: list[BaseAgent]):
+    def __init__(self, router: RouterAgent, agents: list[ResearchAgent]):
         self.router = router
         self.agents = agents
 
     async def stream_research(self, query):
         """Stream the router and selected agents, yielding router and agent results as they complete."""
-        agent_list = [{"name": a.name, "description": a.system} for a in self.agents]
+        agent_list = [
+            {"name": agent.name, "role": agent.system_prompt} for agent in self.agents
+        ]
         result = await self.router.run(query, agent_list)
 
         if (

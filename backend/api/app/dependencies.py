@@ -1,10 +1,10 @@
 from functools import lru_cache
 from app.models.router import RouterAgent
-from app.models.culture import CultureAgent
-from app.models.food import FoodAgent
-from app.models.logistics import LogisticsAgent
-from app.models.must_do import MustDoAgent
-from app.models.safety import SafetyAgent
+from app.models.research_agent_culture import CultureAgent
+from app.models.research_agent_food import FoodAgent
+from app.models.research_agent_logistics import LogisticsAgent
+from app.models.research_agent_activities import ActivitiesAgent
+from app.models.research_agent_safety import SafetyAgent
 from app.services.research_orchestrator import ResearchOrchestrator
 from anthropic import AsyncAnthropic
 from app.config import Settings
@@ -29,7 +29,7 @@ def get_orchestrator() -> ResearchOrchestrator:
             CultureAgent(client=client, settings=settings),
             FoodAgent(client=client, settings=settings),
             LogisticsAgent(client=client, settings=settings),
-            MustDoAgent(client=client, settings=settings),
+            ActivitiesAgent(client=client, settings=settings),
             SafetyAgent(client=client, settings=settings),
         ],
     )

@@ -8,7 +8,10 @@ from app.config import Settings
 @pytest.fixture
 def mock_settings():
     return Settings(
-        anthropic_api_key="test-key", claude_model="claude-test", claude_max_tokens=100
+        anthropic_api_key="test-key",
+        agents_model="claude-test",
+        router_model="claude-test",
+        claude_max_tokens=100,
     )
 
 
@@ -83,6 +86,6 @@ def mock_anthropic(mock_anthropic_responses):
 
     with (
         patch("app.models.router.RouterAgent.run", fake_router_run),
-        patch("app.models.base.BaseAgent.run", fake_run),
+        patch("app.models.research_agent.ResearchAgent.run", fake_run),
     ):
         yield responses

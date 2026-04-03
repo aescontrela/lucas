@@ -18,7 +18,7 @@ ResearchOrchestrator ← runs selected agents in parallel, streams results via S
     ├── FoodAgent
     ├── CultureAgent
     ├── LogisticsAgent
-    ├── MustDoAgent
+    ├── Activities
     └── SafetyAgent
 ```
 

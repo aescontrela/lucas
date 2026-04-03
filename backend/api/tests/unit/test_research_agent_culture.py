@@ -1,9 +1,9 @@
 import pytest
-from app.models.culture import CultureAgent
+from app.models.research_agent_culture import CultureAgent
 
 
 @pytest.mark.asyncio
-async def test_culture_agent_run(
+async def test_research_agent_culture_run(
     mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
 ):
     agent = CultureAgent(client=mock_client, settings=mock_settings)

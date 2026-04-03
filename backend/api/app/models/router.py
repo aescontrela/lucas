@@ -4,14 +4,14 @@ from app.schemas.agents import RouterAgentOutput
 
 
 class RouterAgent:
-    """Selects which research agents to run and returns an enriched list of agent tasks."""
+    """Selects which agents to run and returns an enriched list of agent tasks."""
 
     def __init__(self, client: AsyncAnthropic, settings: Settings):
         self.client = client
-        self.model = settings.claude_model
+        self.model = settings.router_model
         self.max_tokens = int(settings.claude_max_tokens)
         self.name = "router"
-        self.system = (
+        self.system_prompt = (
             "You are a travel research router. Given a user's travel query, "
             "extract key details (destination, dates, interests, constraints), "
             "select the relevant agents, and write a specific, focused task for each one."
@@ -20,12 +20,12 @@ class RouterAgent:
     async def run(self, query, agent_list) -> dict:
         """Return a dict with 'query' (enriched string) and 'agents' (list of {name, task} objects)."""
         agent_list_str = "\n".join(
-            f"{agent['name']}: {agent['description']}" for agent in agent_list
+            f"{agent['name']}: {agent['role']}" for agent in agent_list
         )
         response = await self.client.messages.parse(
             model=self.model,
             max_tokens=self.max_tokens,
-            system=self.system,
+            system=self.system_prompt,
             output_format=RouterAgentOutput,
             messages=[
                 {

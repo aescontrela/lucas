@@ -18,7 +18,7 @@ async def test_research(client):
                 "culture": {"sections": []},
                 "food": {"sections": []},
                 "logistics": {"sections": []},
-                "must_do": {"sections": []},
+                "activities": {"sections": []},
                 "safety": {"sections": []},
             }
         )
@@ -33,7 +33,7 @@ async def test_research(client):
         "culture",
         "food",
         "logistics",
-        "must_do",
+        "activities",
         "safety",
     }
 
@@ -47,7 +47,7 @@ async def test_research_agent_errors(client):
                 "culture": {"sections": []},
                 "food": None,
                 "logistics": {"sections": []},
-                "must_do": {"sections": []},
+                "activities": {"sections": []},
                 "safety": None,
             }
         )
@@ -55,7 +55,7 @@ async def test_research_agent_errors(client):
     sse = parse_sse_events(client.post("/research", json={"query": "Tokyo?"}))
     app.dependency_overrides.clear()
 
-    assert sse["results"].keys() == {"culture", "logistics", "must_do"}
+    assert sse["results"].keys() == {"culture", "logistics", "activities"}
     assert sse["errors"].keys() == {"food", "safety"}
     assert sse["stream_error"] is None
     assert sse["done"] is True

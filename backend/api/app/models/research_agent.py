@@ -1,22 +1,18 @@
 from anthropic import AsyncAnthropic
 from app.config import Settings
+from app.constants import PROMPTS_DIR
 from app.schemas.agents import BaseAgentOutput
 
 
 class ResearchAgent:
     """Base class for travel research agents. Subclasses set ``role`` (system instruction for the model)."""
 
-    def __init__(self, name, description, client: AsyncAnthropic, settings: Settings):
+    def __init__(self, name, client: AsyncAnthropic, settings: Settings):
         self.name = name
-        self.description = description
         self.client = client
         self.model = settings.agents_model
         self.max_tokens = settings.claude_max_tokens
-        self.base_instructions = (
-            "Be concise and practical. Focus on actionable advice for travelers. "
-            "You are a local expert with deep knowledge of this destination. "
-            "Use exactly 3–4 sections. Use markdown only; no code blocks."
-        )
+        self.base_instructions = (PROMPTS_DIR / "research_instructions.md").read_text()
 
     async def run(self, task) -> dict:
         """Run the agent and return structured output (sections with heading and content)."""

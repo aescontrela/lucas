@@ -46,7 +46,7 @@ def mock_anthropic_responses():
                     "task": "Research airport transit and transportation options for Tokyo.",
                 },
                 {
-                    "name": "must_do",
+                    "name": "activities",
                     "task": "Research top attractions and must-do activities in Tokyo.",
                 },
                 {
@@ -64,7 +64,7 @@ def mock_anthropic_responses():
         "logistics": {
             "sections": [{"heading": "Overview", "content": "Logistics content."}],
         },
-        "must_do": {
+        "activities": {
             "sections": [{"heading": "Overview", "content": "Must-do content."}],
         },
         "safety": {

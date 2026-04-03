@@ -1,5 +1,6 @@
 from anthropic import AsyncAnthropic
 from app.config import Settings
+from app.constants import PROMPTS_DIR
 from app.schemas.agents import RouterAgentOutput
 
 
@@ -11,11 +12,7 @@ class RouterAgent:
         self.model = settings.router_model
         self.max_tokens = int(settings.claude_max_tokens)
         self.name = "router"
-        self.system_prompt = (
-            "You are a travel research router. Given a user's travel query, "
-            "extract key details (destination, dates, interests, constraints), "
-            "select the relevant agents, and write a specific, focused task for each one."
-        )
+        self.system_prompt = (PROMPTS_DIR / "router.md").read_text()
 
     async def run(self, query, agent_list) -> dict:
         """Return a dict with 'query' (enriched string) and 'agents' (list of {name, task} objects)."""

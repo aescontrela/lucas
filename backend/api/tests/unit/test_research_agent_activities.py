@@ -10,5 +10,5 @@ async def test_research_agent_activities_run(
     result = await agent.run(
         "Research top attractions and must-do activities in Tokyo at spring"
     )
-    expected = mock_anthropic_responses["must_do"]
+    expected = mock_anthropic_responses["activities"]
     assert result == expected

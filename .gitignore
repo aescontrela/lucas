@@ -13,3 +13,4 @@ wheels/
 # Environment variables
 .env
 .vscode
+.DS_Store

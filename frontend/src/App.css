@@ -1,0 +1,5 @@
+#root {
+  max-width: var(--layout-width);
+  padding-inline: var(--space-md);
+  margin: 0 auto;
+}

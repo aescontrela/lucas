@@ -1,0 +1,62 @@
+:root {
+  --black: #131520;
+  --white: #fafafa;
+  --purple-900: #1f1a2a;
+  --purple-800: #372a40;
+  --purple-600: #4f4b63;
+  --purple-400: #8b8698;
+  --purple-300: #c2bfc9;
+  --purple-200: #d4d1da;
+  --purple-100: #eae8ec;
+  --color-accent: #7c6aad;
+  --color-accent-hover: #6e5c9e;
+  --red-500: #c4475a;
+  --red-600: #a83a4c;
+  --red-400: #d4687a;
+  --color-text: var(--purple-900);
+  --color-text-muted: var(--purple-400);
+  --color-bg: var(--purple-100);
+  --color-bg-surface: var(--white);
+  --color-border: var(--purple-200);
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --font-heading: "Sora", sans-serif;
+  --font-default: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --layout-width: 960px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-default);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

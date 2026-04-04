@@ -15,11 +15,11 @@ async def test_research(client):
     app.dependency_overrides[get_orchestrator] = lambda: mock_orchestrator(
         make_agent_stream(
             {
-                "culture": {"sections": []},
-                "food": {"sections": []},
-                "logistics": {"sections": []},
-                "activities": {"sections": []},
-                "safety": {"sections": []},
+                "culture": "Culture content.",
+                "food": "Food content.",
+                "logistics": "Logistics content.",
+                "activities": "Activities content.",
+                "safety": "Safety content.",
             }
         )
     )
@@ -44,10 +44,10 @@ async def test_research_agent_errors(client):
     app.dependency_overrides[get_orchestrator] = lambda: mock_orchestrator(
         make_agent_stream(
             {
-                "culture": {"sections": []},
+                "culture": "Culture content.",
                 "food": None,
-                "logistics": {"sections": []},
-                "activities": {"sections": []},
+                "logistics": "Logistics content.",
+                "activities": "Activities content.",
                 "safety": None,
             }
         )

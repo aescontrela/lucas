@@ -13,13 +13,13 @@ User query
 RouterAgent          ← selects relevant agents, writes a tailored task for each one
     │
     ▼
-ResearchOrchestrator ← runs selected agents in parallel, streams results via SSE
-    │
-    ├── FoodAgent
-    ├── CultureAgent
-    ├── LogisticsAgent
-    ├── Activities
-    └── SafetyAgent
+ResearchOrchestrator ← runs selected agents concurrently via asyncio.Queue
+    │                    multiplexes all results into a single SSE stream
+    ├── ResearchAgent("food")
+    ├── ResearchAgent("culture")
+    ├── ResearchAgent("logistics")
+    ├── ResearchAgent("activities")
+    └── ResearchAgent("safety")
 ```
 
 ## Stack

@@ -1,47 +1,55 @@
 import asyncio
-
+from collections.abc import AsyncIterator
 from app.models.router import RouterAgent
 from app.models.research_agent import ResearchAgent
 
 
-class ResearchOrchestrator:
+class ResearchOrchestratorService:
     def __init__(self, router: RouterAgent, agents: list[ResearchAgent]):
         self.router = router
         self.agents = agents
 
-    async def stream_research(self, query):
-        """Stream the router and selected agents, yielding router and agent results as they complete."""
+    async def stream_research(self, query: str) -> AsyncIterator[dict]:
         agent_list = [
             {"name": agent.name, "role": agent.system_prompt} for agent in self.agents
         ]
-        result = await self.router.run(query, agent_list)
+        plan = await self.router.run(query, agent_list)
 
-        if (
-            not isinstance(result, dict)
-            or "query" not in result
-            or "agents" not in result
-        ):
-            raise ValueError(
-                "Router did not return expected response shape (query, agents)"
-            )
+        yield {"event": "router", "data": plan.model_dump()}
 
-        yield {"event": "router", "data": result}
+        agents_by_name = {agent.name: agent for agent in self.agents}
 
-        tasks = {a["name"]: a["task"] for a in result["agents"]}
-        selected = [agent for agent in self.agents if agent.name in tasks]
+        selected = [
+            (agents_by_name[a.name], a.task)
+            for a in plan.agents
+            if a.name in agents_by_name
+        ]
 
-        async def run_and_tag(agent):
+        queue = asyncio.Queue()
+        finished = 0
+
+        async def run_agent(agent, task):
             try:
-                outcome = await agent.run(tasks[agent.name])
-                return agent.name, outcome, None
+                async for token in agent.stream_tokens(task):
+                    await queue.put(
+                        {"event": "delta", "agent": agent.name, "text": token}
+                    )
+                await queue.put({"event": "done", "agent": agent.name})
             except Exception as e:
-                return agent.name, None, str(e)
+                await queue.put(
+                    {"event": "error", "agent": agent.name, "error": str(e)}
+                )
 
-        for coro in asyncio.as_completed([run_and_tag(agent) for agent in selected]):
-            agent_name, result, error = await coro
-            yield {
-                "event": "agent",
-                "agent": agent_name,
-                "data": result,
-                "error": error,
-            }
+        tasks = [
+            asyncio.create_task(run_agent(agent, task)) for agent, task in selected
+        ]
+
+        try:
+            while finished < len(tasks):
+                event = await queue.get()
+                yield event
+                if event["event"] in ("done", "error"):
+                    finished += 1
+        finally:
+            for task in tasks:
+                task.cancel()

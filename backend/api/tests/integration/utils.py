@@ -8,33 +8,44 @@ def parse_sse_events(response):
         for line in response.text.splitlines()
         if line.startswith("data: ")
     ]
+    # Collect streamed tokens per agent
+    agent_tokens = {}
+    for e in events:
+        if e["event"] == "delta":
+            agent_tokens.setdefault(e["agent"], []).append(e["text"])
+
+    # Build results from agents that completed with "done"
+    done_agents = {e["agent"] for e in events if e["event"] == "done" and "agent" in e}
+    results = {
+        name: "".join(tokens)
+        for name, tokens in agent_tokens.items()
+        if name in done_agents
+    }
+
     return {
-        "results": {
-            e["agent"]: e["data"]
-            for e in events
-            if e["event"] == "agent" and e["error"] is None
-        },
+        "results": results,
         "errors": {
             e["agent"]: e["error"]
             for e in events
-            if e["event"] == "agent" and e["error"] is not None
+            if e["event"] == "error" and "agent" in e
         },
         "stream_error": next(
-            (e["detail"] for e in events if e["event"] == "error"), None
+            (e["detail"] for e in events if e["event"] == "error" and "detail" in e),
+            None,
         ),
-        "done": any(e["event"] == "done" for e in events),
+        "done": any(e["event"] == "done" and "agent" not in e for e in events),
     }
 
 
 def make_agent_stream(agent_responses):
     async def stream(*args, **kwargs):
+        yield {"event": "router", "data": {"query": "test", "agents": []}}
         for name, data in agent_responses.items():
-            yield {
-                "event": "agent",
-                "agent": name,
-                "data": data,
-                "error": None if data is not None else f"{name} failed",
-            }
+            if data is not None:
+                yield {"event": "delta", "agent": name, "text": str(data)}
+                yield {"event": "done", "agent": name}
+            else:
+                yield {"event": "error", "agent": name, "error": f"{name} failed"}
 
     return stream
 

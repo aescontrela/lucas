@@ -1,13 +1,12 @@
 from functools import lru_cache
 from app.models.router import RouterAgent
-from app.models.research_agent_culture import CultureAgent
-from app.models.research_agent_food import FoodAgent
-from app.models.research_agent_logistics import LogisticsAgent
-from app.models.research_agent_activities import ActivitiesAgent
-from app.models.research_agent_safety import SafetyAgent
-from app.services.research_orchestrator import ResearchOrchestrator
+from app.models.research_agent import ResearchAgent
+from app.services.research_orchestrator import ResearchOrchestratorService
 from anthropic import AsyncAnthropic
 from app.config import Settings
+
+
+AGENT_NAMES = ["food", "culture", "logistics", "activities", "safety"]
 
 
 @lru_cache
@@ -20,16 +19,13 @@ def get_anthropic_client() -> AsyncAnthropic:
     return AsyncAnthropic(api_key=get_settings().anthropic_api_key)
 
 
-def get_orchestrator() -> ResearchOrchestrator:
+def get_orchestrator() -> ResearchOrchestratorService:
     client = get_anthropic_client()
     settings = get_settings()
-    return ResearchOrchestrator(
+    return ResearchOrchestratorService(
         router=RouterAgent(client=client, settings=settings),
         agents=[
-            CultureAgent(client=client, settings=settings),
-            FoodAgent(client=client, settings=settings),
-            LogisticsAgent(client=client, settings=settings),
-            ActivitiesAgent(client=client, settings=settings),
-            SafetyAgent(client=client, settings=settings),
+            ResearchAgent(client=client, settings=settings, name=name)
+            for name in AGENT_NAMES
         ],
     )

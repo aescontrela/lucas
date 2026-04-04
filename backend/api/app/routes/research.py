@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.schemas.research import ResearchRequest
-from app.services.research_orchestrator import ResearchOrchestrator
+from app.services.research_orchestrator import ResearchOrchestratorService
 from app.dependencies import get_orchestrator
 
 router = APIRouter()
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @router.post("/research")
 async def research(
     request: ResearchRequest,
-    orchestrator: ResearchOrchestrator = Depends(get_orchestrator),
+    orchestrator: ResearchOrchestratorService = Depends(get_orchestrator),
 ):
     async def generate():
         try:
@@ -22,7 +22,7 @@ async def research(
         except ValueError as e:
             yield f"data: {json.dumps({'event': 'error', 'detail': str(e)})}\n\n"
         except Exception:
-            yield f"data: {json.dumps({'event': 'error', 'detail': 'Research service temporarily unavailable.'})}\n\n"
+            yield f"data: {json.dumps({'event': 'error', 'detail': 'Research service temporarily unavailable'})}\n\n"
         finally:
             yield 'data: {"event": "done"}\n\n'
 

@@ -1,8 +1,13 @@
 import pytest
+from contextlib import contextmanager
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from main import app
 from app.config import Settings
+from app.models.router import RouterAgent
+from app.models.research_agent import ResearchAgent
+from app.schemas.agents import RouterAgentOutput
+from app.services.research_orchestrator import ResearchOrchestratorService
 
 
 @pytest.fixture
@@ -47,7 +52,7 @@ def mock_anthropic_responses():
                 },
                 {
                     "name": "activities",
-                    "task": "Research top attractions and must-do activities in Tokyo.",
+                    "task": "Research top attractions and activities in Tokyo.",
                 },
                 {
                     "name": "safety",
@@ -55,37 +60,70 @@ def mock_anthropic_responses():
                 },
             ],
         },
-        "culture": {
-            "sections": [{"heading": "Overview", "content": "Culture content."}],
-        },
-        "food": {
-            "sections": [{"heading": "Overview", "content": "Food content."}],
-        },
-        "logistics": {
-            "sections": [{"heading": "Overview", "content": "Logistics content."}],
-        },
-        "activities": {
-            "sections": [{"heading": "Overview", "content": "Must-do content."}],
-        },
-        "safety": {
-            "sections": [{"heading": "Overview", "content": "Safety content."}],
-        },
+        "culture": "Culture content.",
+        "food": "Food content.",
+        "logistics": "Logistics content.",
+        "activities": "Activities content.",
+        "safety": "Safety content.",
     }
 
 
 @pytest.fixture
 def mock_anthropic(mock_anthropic_responses):
-    """Mock Anthropic API: router gets plan shape, agents get sections shape."""
+    """Mock Anthropic API: router gets plan shape, agents stream tokens."""
     responses = mock_anthropic_responses
 
-    async def fake_run(self, query):
-        return responses[self.name]
-
     async def fake_router_run(self, query, agent_list):
-        return responses["router"]
+        return RouterAgentOutput(**responses["router"])
+
+    async def fake_stream_tokens(self, task):
+        text = responses[self.name]
+        for word in text.split(" "):
+            yield word + " "
 
     with (
         patch("app.models.router.RouterAgent.run", fake_router_run),
-        patch("app.models.research_agent.ResearchAgent.run", fake_run),
+        patch(
+            "app.models.research_agent.ResearchAgent.stream_tokens", fake_stream_tokens
+        ),
     ):
         yield responses
+
+
+@pytest.fixture
+def mock_anthropic_with_failure(mock_anthropic_responses):
+    responses = mock_anthropic_responses
+
+    @contextmanager
+    def _mock(failing_agents: set[str]):
+        async def fake_router_run(self, query, agent_list):
+            return RouterAgentOutput(**responses["router"])
+
+        async def fake_stream_tokens(self, task):
+            if self.name in failing_agents:
+                raise Exception(f"{self.name} agent failed")
+            text = responses[self.name]
+            for word in text.split(" "):
+                yield word + " "
+
+        with (
+            patch("app.models.router.RouterAgent.run", fake_router_run),
+            patch(
+                "app.models.research_agent.ResearchAgent.stream_tokens",
+                fake_stream_tokens,
+            ),
+        ):
+            yield responses
+
+    return _mock
+
+
+@pytest.fixture
+def orchestrator(mock_client, mock_settings):
+    router = RouterAgent(client=mock_client, settings=mock_settings)
+
+    agents = [
+        ResearchAgent(client=mock_client, settings=mock_settings, name=name)
+        for name in ["food", "culture", "logistics", "activities", "safety"]
+    ]
+    return ResearchOrchestratorService(router=router, agents=agents)

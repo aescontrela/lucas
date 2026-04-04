@@ -1,17 +1,16 @@
 from pydantic import BaseModel
+from typing import TypedDict, Literal
+
+AgentName = Literal["food", "safety", "culture", "logistics", "activities"]
 
 
-class Section(BaseModel):
-    heading: str
-    content: str
-
-
-class BaseAgentOutput(BaseModel):
-    sections: list[Section]
+class AgentInfo(TypedDict):
+    name: AgentName
+    role: str
 
 
 class AgentTask(BaseModel):
-    name: str
+    name: AgentName
     task: str
 
 

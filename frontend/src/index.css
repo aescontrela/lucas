@@ -38,6 +38,12 @@
   --layout-width: 960px;
 }
 
+#root {
+  max-width: var(--layout-width);
+  padding-inline: var(--space-md);
+  margin: 0 auto;
+}
+
 *,
 *::before,
 *::after {

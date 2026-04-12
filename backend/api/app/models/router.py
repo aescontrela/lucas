@@ -1,6 +1,6 @@
 from anthropic import AsyncAnthropic
 from app.config import Settings
-from app.constants import PROMPTS_DIR
+from app.constants import PROMPTS_DIR, ROUTER_MAX_TOKENS
 from app.schemas.agents import AgentInfo, RouterAgentOutput
 
 
@@ -10,7 +10,7 @@ class RouterAgent:
     def __init__(self, client: AsyncAnthropic, settings: Settings):
         self.client = client
         self.model = settings.router_model
-        self.max_tokens = int(settings.claude_max_tokens)
+        self.max_tokens = ROUTER_MAX_TOKENS
         self.name = "router"
         self.system_prompt = (PROMPTS_DIR / "router.md").read_text()
 

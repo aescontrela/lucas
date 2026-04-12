@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from main import app
 from app.config import Settings
+from app.constants import AGENTS_CONFIG
 from app.models.router import RouterAgent
 from app.models.research_agent import ResearchAgent
 from app.schemas.agents import RouterAgentOutput
@@ -16,7 +17,6 @@ def mock_settings():
         anthropic_api_key="test-key",
         agents_model="claude-test",
         router_model="claude-test",
-        claude_max_tokens=100,
     )
 
 
@@ -123,7 +123,9 @@ def orchestrator(mock_client, mock_settings):
     router = RouterAgent(client=mock_client, settings=mock_settings)
 
     agents = [
-        ResearchAgent(client=mock_client, settings=mock_settings, name=name)
-        for name in ["food", "culture", "logistics", "activities", "safety"]
+        ResearchAgent(
+            client=mock_client, settings=mock_settings, name=name, max_tokens=max_tokens
+        )
+        for name, max_tokens in AGENTS_CONFIG.items()
     ]
     return ResearchOrchestratorService(router=router, agents=agents)

@@ -1,4 +1,5 @@
 import pytest
+from app.constants import AGENTS_CONFIG
 from app.models.router import RouterAgent
 from app.models.research_agent import ResearchAgent
 from app.schemas.agents import RouterAgentOutput
@@ -13,11 +14,10 @@ async def test_router_agent_run(
 ):
     agent = RouterAgent(client=mock_client, settings=mock_settings)
     agents = [
-        ResearchAgent(name="food", client=mock_client, settings=mock_settings),
-        ResearchAgent(name="culture", client=mock_client, settings=mock_settings),
-        ResearchAgent(name="activities", client=mock_client, settings=mock_settings),
-        ResearchAgent(name="logistics", client=mock_client, settings=mock_settings),
-        ResearchAgent(name="safety", client=mock_client, settings=mock_settings),
+        ResearchAgent(
+            name=name, max_tokens=max_tokens, client=mock_client, settings=mock_settings
+        )
+        for name, max_tokens in AGENTS_CONFIG.items()
     ]
     result = await agent.run(
         "Tokyo at spring",

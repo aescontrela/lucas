@@ -21,7 +21,7 @@ async def research(
                 yield f"data: {json.dumps(event)}\n\n"
         except ValueError as e:
             yield f"data: {json.dumps({'event': 'error', 'detail': str(e)})}\n\n"
-        except Exception as e:
+        except Exception:
             yield f"data: {json.dumps({'event': 'error', 'detail': 'Research service temporarily unavailable'})}\n\n"
         finally:
             yield 'data: {"event": "done"}\n\n'

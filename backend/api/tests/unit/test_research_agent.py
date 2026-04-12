@@ -1,12 +1,21 @@
 import pytest
 from app.models.research_agent import ResearchAgent
+from app.constants import AGENTS_CONFIG
 
 
 @pytest.mark.asyncio
 async def test_research_agent_activities_stream(
-    mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
+    mock_anthropic,
+    mock_anthropic_responses,
+    mock_client,
+    mock_settings,
 ):
-    agent = ResearchAgent(name="activities", client=mock_client, settings=mock_settings)
+    agent = ResearchAgent(
+        name="activities",
+        max_tokens=AGENTS_CONFIG["activities"],
+        client=mock_client,
+        settings=mock_settings,
+    )
     tokens = [
         token
         async for token in agent.stream_tokens(
@@ -19,9 +28,17 @@ async def test_research_agent_activities_stream(
 
 @pytest.mark.asyncio
 async def test_research_agent_culture_stream(
-    mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
+    mock_anthropic,
+    mock_anthropic_responses,
+    mock_client,
+    mock_settings,
 ):
-    agent = ResearchAgent(name="culture", client=mock_client, settings=mock_settings)
+    agent = ResearchAgent(
+        name="culture",
+        max_tokens=AGENTS_CONFIG["culture"],
+        client=mock_client,
+        settings=mock_settings,
+    )
     tokens = [
         token
         async for token in agent.stream_tokens(
@@ -34,9 +51,17 @@ async def test_research_agent_culture_stream(
 
 @pytest.mark.asyncio
 async def test_research_agent_food_stream(
-    mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
+    mock_anthropic,
+    mock_anthropic_responses,
+    mock_client,
+    mock_settings,
 ):
-    agent = ResearchAgent(name="food", client=mock_client, settings=mock_settings)
+    agent = ResearchAgent(
+        name="food",
+        max_tokens=AGENTS_CONFIG["food"],
+        client=mock_client,
+        settings=mock_settings,
+    )
     tokens = [
         token
         async for token in agent.stream_tokens(
@@ -49,9 +74,17 @@ async def test_research_agent_food_stream(
 
 @pytest.mark.asyncio
 async def test_research_agent_logistics_stream(
-    mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
+    mock_anthropic,
+    mock_anthropic_responses,
+    mock_client,
+    mock_settings,
 ):
-    agent = ResearchAgent(name="logistics", client=mock_client, settings=mock_settings)
+    agent = ResearchAgent(
+        name="logistics",
+        max_tokens=AGENTS_CONFIG["logistics"],
+        client=mock_client,
+        settings=mock_settings,
+    )
     tokens = [
         token
         async for token in agent.stream_tokens(
@@ -64,9 +97,17 @@ async def test_research_agent_logistics_stream(
 
 @pytest.mark.asyncio
 async def test_research_agent_safety_stream(
-    mock_anthropic, mock_anthropic_responses, mock_client, mock_settings
+    mock_anthropic,
+    mock_anthropic_responses,
+    mock_client,
+    mock_settings,
 ):
-    agent = ResearchAgent(name="safety", client=mock_client, settings=mock_settings)
+    agent = ResearchAgent(
+        name="safety",
+        max_tokens=AGENTS_CONFIG["safety"],
+        client=mock_client,
+        settings=mock_settings,
+    )
     tokens = [
         token
         async for token in agent.stream_tokens(

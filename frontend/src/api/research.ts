@@ -1,4 +1,4 @@
-import { type SSEEvent } from "./types";
+import { type SSEEvent } from "../features/research/types";
 
 export const researchApi = {
   postResearch: async (query: string, onEvent: (event: SSEEvent) => void) => {

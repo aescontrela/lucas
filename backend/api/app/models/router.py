@@ -1,4 +1,5 @@
 from anthropic import AsyncAnthropic
+
 from app.config import Settings
 from app.constants import PROMPTS_DIR, ROUTER_MAX_TOKENS
 from app.schemas.agents import AgentInfo, RouterAgentOutput
@@ -39,5 +40,8 @@ class RouterAgent:
                 }
             ],
         )
+
+        if response.parsed_output is None:
+            raise ValueError("Router returned no parsed output")
 
         return response.parsed_output

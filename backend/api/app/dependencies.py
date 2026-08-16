@@ -1,10 +1,12 @@
 from functools import lru_cache
-from app.models.router import RouterAgent
-from app.models.research_agent import ResearchAgent
-from app.services.research_orchestrator import ResearchOrchestratorService
+
 from anthropic import AsyncAnthropic
+
 from app.config import Settings
 from app.constants import AGENTS_CONFIG
+from app.models.research_agent import ResearchAgent
+from app.models.router import RouterAgent
+from app.services.research_orchestrator import ResearchOrchestratorService
 
 
 @lru_cache
@@ -17,6 +19,7 @@ def get_anthropic_client() -> AsyncAnthropic:
     return AsyncAnthropic(api_key=get_settings().anthropic_api_key)
 
 
+@lru_cache
 def get_orchestrator() -> ResearchOrchestratorService:
     client = get_anthropic_client()
     settings = get_settings()

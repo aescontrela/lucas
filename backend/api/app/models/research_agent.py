@@ -1,14 +1,19 @@
 from collections.abc import AsyncIterator
+
 from anthropic import AsyncAnthropic
+
 from app.config import Settings
 from app.constants import PROMPTS_DIR
+from app.schemas.agents import AgentName
 
 
 class ResearchAgent:
     """Travel research agent. Loads system prompt from prompts/research_{name}.md and base instructions from prompts/research_instructions.md."""
 
+    name: AgentName
+
     def __init__(
-        self, name: str, max_tokens: int, client: AsyncAnthropic, settings: Settings
+        self, name: AgentName, max_tokens: int, client: AsyncAnthropic, settings: Settings
     ):
         self.name = name
         self.client = client

@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.config import Settings
+
+from app.dependencies import get_settings
 from app.routes.health import router as health_router
 from app.routes.research import router as research_router
 
-settings = Settings()
+settings = get_settings()
 
 app = FastAPI()
 

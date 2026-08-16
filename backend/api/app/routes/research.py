@@ -37,7 +37,10 @@ def sse(event: ResearchEvent) -> str:
         "| `agent_error` | `agent`, `detail` | That agent failed or timed out; the rest keep streaming |\n"
         "| `stream_error` | `detail` | The whole run failed; no more agent events follow |\n"
         "| `stream_done` | — | Terminal event, always sent last |\n\n"
-        "Event models are defined in `app/schemas/events.py`."
+        "Event models are defined in `app/schemas/events.py`.\n\n"
+        "**Note:** Swagger UI's *Execute* button buffers the whole response and "
+        "will appear to hang while the stream runs. To watch events arrive "
+        "live, use `curl -N` instead."
     ),
     response_description="Server-Sent Events stream of research events",
     responses={

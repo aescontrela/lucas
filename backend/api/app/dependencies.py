@@ -11,7 +11,7 @@ from app.services.research_orchestrator import ResearchOrchestratorService
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # pyright: ignore[reportCallIssue]
 
 
 @lru_cache

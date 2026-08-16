@@ -7,7 +7,16 @@ from app.routes.research import router as research_router
 
 settings = get_settings()
 
-app = FastAPI()
+app = FastAPI(
+    title="Travel Research API",
+    description=(
+        "Multi-agent travel research over Server-Sent Events. "
+        "A router agent plans the research, then domain agents "
+        "(food, culture, logistics, safety, activities) stream their "
+        "findings concurrently through a single SSE response."
+    ),
+    version="0.1.0",
+)
 
 app.add_middleware(
     CORSMiddleware,

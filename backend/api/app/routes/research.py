@@ -9,7 +9,7 @@ from app.schemas.events import ResearchEvent, StreamDoneEvent, StreamErrorEvent
 from app.schemas.research import ResearchRequest
 from app.services.research_orchestrator import ResearchOrchestratorService
 
-router = APIRouter()
+router = APIRouter(tags=["research"])
 logger = logging.getLogger(__name__)
 
 SSE_HEADERS = {
@@ -22,7 +22,39 @@ def sse(event: ResearchEvent) -> str:
     return f"data: {event.model_dump_json()}\n\n"
 
 
-@router.post("/research")
+@router.post(
+    "/research",
+    summary="Stream multi-agent travel research",
+    description=(
+        "Runs the router agent to plan the research, then streams the "
+        "selected agents' findings concurrently as Server-Sent Events. "
+        "Each `data:` line is a JSON object discriminated by its `event` field:\n\n"
+        "| Event | Payload | Meaning |\n"
+        "| --- | --- | --- |\n"
+        "| `router` | `data: {query, agents: [{name, task}]}` | The research plan |\n"
+        "| `agent_delta` | `agent`, `text` | A streamed text chunk from one agent |\n"
+        "| `agent_done` | `agent` | That agent finished successfully |\n"
+        "| `agent_error` | `agent`, `detail` | That agent failed or timed out; the rest keep streaming |\n"
+        "| `stream_error` | `detail` | The whole run failed; no more agent events follow |\n"
+        "| `stream_done` | — | Terminal event, always sent last |\n\n"
+        "Event models are defined in `app/schemas/events.py`."
+    ),
+    response_description="Server-Sent Events stream of research events",
+    responses={
+        200: {
+            "content": {
+                "text/event-stream": {
+                    "schema": {"type": "string", "format": "sse"},
+                    "example": (
+                        'data: {"event":"agent_delta","agent":"food","text":"Try the..."}\n\n'
+                        'data: {"event":"agent_done","agent":"food"}\n\n'
+                        'data: {"event":"stream_done"}\n\n'
+                    ),
+                }
+            },
+        },
+    },
+)
 async def research(
     request: ResearchRequest,
     orchestrator: Annotated[ResearchOrchestratorService, Depends(get_orchestrator)],

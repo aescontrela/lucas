@@ -1,29 +1,45 @@
-import json
 import logging
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
+
+from app.dependencies import get_orchestrator
+from app.schemas.events import ResearchEvent, StreamDoneEvent, StreamErrorEvent
 from app.schemas.research import ResearchRequest
 from app.services.research_orchestrator import ResearchOrchestratorService
-from app.dependencies import get_orchestrator
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+SSE_HEADERS = {
+    "Cache-Control": "no-cache",
+    "X-Accel-Buffering": "no",
+}
+
+
+def sse(event: ResearchEvent) -> str:
+    return f"data: {event.model_dump_json()}\n\n"
 
 
 @router.post("/research")
 async def research(
     request: ResearchRequest,
-    orchestrator: ResearchOrchestratorService = Depends(get_orchestrator),
+    orchestrator: Annotated[ResearchOrchestratorService, Depends(get_orchestrator)],
 ):
     async def generate():
         try:
             async for event in orchestrator.stream_research(request.query):
-                yield f"data: {json.dumps(event)}\n\n"
+                yield sse(event)
         except ValueError as e:
-            yield f"data: {json.dumps({'event': 'error', 'detail': str(e)})}\n\n"
+            yield sse(StreamErrorEvent(detail=str(e)))
         except Exception:
-            yield f"data: {json.dumps({'event': 'error', 'detail': 'Research service temporarily unavailable'})}\n\n"
-        finally:
-            yield 'data: {"event": "done"}\n\n'
+            logger.exception("Research stream failed")
+            yield sse(
+                StreamErrorEvent(detail="Research service temporarily unavailable")
+            )
+        yield sse(StreamDoneEvent())
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        generate(), media_type="text/event-stream", headers=SSE_HEADERS
+    )

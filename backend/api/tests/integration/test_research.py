@@ -92,3 +92,17 @@ async def test_research_upstream_error(client):
 async def test_research_invalid_input(client):
     response = client.post("/research", json={})
     assert response.status_code == 422
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_research_rejects_empty_query(client):
+    response = client.post("/research", json={"query": ""})
+    assert response.status_code == 422
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_research_rejects_oversized_query(client):
+    response = client.post("/research", json={"query": "x" * 501})
+    assert response.status_code == 422

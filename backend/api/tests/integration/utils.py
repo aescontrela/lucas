@@ -1,6 +1,14 @@
 import json
 from unittest.mock import MagicMock
 
+from app.schemas.agents import RouterAgentOutput
+from app.schemas.events import (
+    AgentDeltaEvent,
+    AgentDoneEvent,
+    AgentErrorEvent,
+    RouterEvent,
+)
+
 
 def parse_sse_events(response):
     events = [
@@ -11,11 +19,11 @@ def parse_sse_events(response):
     # Collect streamed tokens per agent
     agent_tokens = {}
     for e in events:
-        if e["event"] == "delta":
+        if e["event"] == "agent_delta":
             agent_tokens.setdefault(e["agent"], []).append(e["text"])
 
-    # Build results from agents that completed with "done"
-    done_agents = {e["agent"] for e in events if e["event"] == "done" and "agent" in e}
+    # Build results from agents that completed with "agent_done"
+    done_agents = {e["agent"] for e in events if e["event"] == "agent_done"}
     results = {
         name: "".join(tokens)
         for name, tokens in agent_tokens.items()
@@ -25,27 +33,25 @@ def parse_sse_events(response):
     return {
         "results": results,
         "errors": {
-            e["agent"]: e["error"]
-            for e in events
-            if e["event"] == "error" and "agent" in e
+            e["agent"]: e["detail"] for e in events if e["event"] == "agent_error"
         },
         "stream_error": next(
-            (e["detail"] for e in events if e["event"] == "error" and "detail" in e),
+            (e["detail"] for e in events if e["event"] == "stream_error"),
             None,
         ),
-        "done": any(e["event"] == "done" and "agent" not in e for e in events),
+        "done": any(e["event"] == "stream_done" for e in events),
     }
 
 
 def make_agent_stream(agent_responses):
     async def stream(*args, **kwargs):
-        yield {"event": "router", "data": {"query": "test", "agents": []}}
+        yield RouterEvent(data=RouterAgentOutput(query="test", agents=[]))
         for name, data in agent_responses.items():
             if data is not None:
-                yield {"event": "delta", "agent": name, "text": str(data)}
-                yield {"event": "done", "agent": name}
+                yield AgentDeltaEvent(agent=name, text=str(data))
+                yield AgentDoneEvent(agent=name)
             else:
-                yield {"event": "error", "agent": name, "error": f"{name} failed"}
+                yield AgentErrorEvent(agent=name, detail=f"{name} failed")
 
     return stream
 

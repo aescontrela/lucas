@@ -17,12 +17,16 @@ markers = [
     "integration: mark a test as a integration test (e.g. tests/integration/)."
 ]
 
+[tool.ruff.lint]
+extend-select = ["B"]
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
 
 [dependency-groups]
 dev = [
+    "pyright>=1.1.411",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
     "ruff>=0.15.0",
